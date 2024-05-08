@@ -19,23 +19,35 @@ let config = {
     render: {
         pixelArt: true  // prevent pixel art from getting blurred when scaled
     },
+    //fps: { forceSetTimeOut: true, target: 60 },
     physics: {
         default: 'arcade',
         arcade: {
             debug: true,
+            fps: 30,
+            fixedstep: true,
+            tileBias: 64,
             gravity: {
                 x: 0,
                 y: 0
             }
         }
     },
-    width: 1440,
-    height: 900,
+    width: 1200,
+    height: 700,
     scene: [Load, Platformer]
 }
 
 var cursors;
 const SCALE = 2.0;
 var my = {sprite: {}, text: {}};
+const enumList = {
+    RIGHT: 0,
+    LEFT: 1,
+    JUMPING: 2,
+    GROUNDED: 3,
+    INAIR: 4,
+    NOJUMP: 5
+};
 
 const game = new Phaser.Game(config);

@@ -45,6 +45,11 @@ class Load extends Phaser.Scene {
             ],
         });
 
+
+        
+
+
+
          // ...and pass to the next Scene
          this.scene.start("platformerScene");
     }
