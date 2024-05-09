@@ -10,7 +10,7 @@ class Platformer extends Phaser.Scene {
         this.RUNTHRESHOLD = 500;
         this.STARTVELOCITY = 300;
         this.MAXVELOCITYX = 1000;
-        this.MAXVELOCITYY = 1500;
+        this.MAXVELOCITYY = 1000;
         this.DRAG = 1500;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1900;
         this.JUMP_VELOCITY = -675;
@@ -65,6 +65,7 @@ class Platformer extends Phaser.Scene {
         my.sprite.player.facing = enumList.RIGHT;
         my.sprite.player.air = enumList.GROUNDED;
         my.sprite.player.animating = false;
+        my.bumpTimed = false;
         //my.sprite.player.doubleJump = true;
 //-----------------------------------------------
 
@@ -205,6 +206,25 @@ class Platformer extends Phaser.Scene {
                 my.sprite.player.running = this.RUNMULTI;
                 my.sprite.player.anims.play('fast');
             }
+            if (my.sprite.player.running > 1 && Math.abs(my.sprite.player.body.velocity.x) <= this.RUNTHRESHOLD) {
+                if (!my.bumpTimed) {
+                    //console.log("test");
+                    my.bumpTimed = true;
+                    my.bumpTime = this.time.addEvent({
+                        delay: 100,                // ms
+                        callback: function () {
+                            if (my.sprite.player.body.blocked.right || my.sprite.player.body.blocked.left) {
+                                my.sprite.player.running = 1;
+                                my.sprite.player.anims.play('idle');
+                                //console.log("test2");
+                            }
+                            my.bumpTimed = false;
+                        },
+                    });
+                }
+                
+
+            }
         }
          
         
@@ -221,14 +241,11 @@ class Platformer extends Phaser.Scene {
             }
             
             if (my.sprite.player.air == enumList.GROUNDED) {
-                my.coyoteTimer = this.time.addEvent({
-                    delay: 134,                // ms
-                    callback: ()=>{
+                my.coyoteTimer = this.time.delayedCall(
+                    134,                // ms
+                    ()=>{
                         my.sprite.player.air = enumList.NOJUMP
-                    },
-                    
-                    loop: false
-                });
+                    });
             } else if (my.sprite.player.air == enumList.INAIR || my.sprite.player.air == enumList.NOJUMP) {
                 my.sprite.player.body.setAccelerationY(0);
             }
@@ -237,12 +254,13 @@ class Platformer extends Phaser.Scene {
         if(my.sprite.player.body.blocked.down) {
             if (my.sprite.player.air != enumList.GROUNDED) {
                 
+                //Fall Tween
                 this.tweens.add({
                     onUpdate: function () {my.sprite.player.setBodySize(24 *(2/my.sprite.player.scaleX), 24*(2/my.sprite.player.scaleY))},
                     targets     : my.sprite.player,
-                    scaleY      : 1.5,
-                    ease        : 'Linear',
-                    duration    : 120,
+                    scaleY      : 1.3,
+                    ease        : 'Quart.Out',
+                    duration    : 100,
                     yoyo: true,
                     onYoyo: function () {console.log(my.sprite.player.scaleY)},
                     onComplete: function () {
@@ -282,13 +300,13 @@ class Platformer extends Phaser.Scene {
                     //speedX: 100
                 });
                 
-                
+                //Jump Tween
                 this.tweens.add({
                     onUpdate: function () {my.sprite.player.setBodySize(24 *(2/my.sprite.player.scale), 24*(2/my.sprite.player.scale))},
                     targets     : my.sprite.player,
-                    scale      : 2.5,
-                    ease        : 'Linear',
-                    duration    : 150,
+                    scale      : 3,
+                    ease        : 'Bounce.In',
+                    duration    : 100,
                     yoyo: true,
                     
                     onComplete: function () {
@@ -300,14 +318,11 @@ class Platformer extends Phaser.Scene {
                 
                 
 
-                my.sillyTime = this.time.addEvent({
-                    delay: 130,                // ms
-                    callback: ()=>{
+                my.sillyTime = this.time.delayedCall(
+                    130,                // ms
+                    ()=>{
                         my.sprite.player.air = enumList.NOJUMP
-                    },
-                    
-                    loop: false
-                });
+                    });
                 
             } /*else if (my.sprite.player.air == enumList.NOJUMP && my.sprite.player.doubleJump) {
                 my.sprite.player.doubleJump = false;
@@ -321,13 +336,14 @@ class Platformer extends Phaser.Scene {
         }
         my.sprite.player.body.setAllowGravity(!my.sprite.player.animating);
 
-        if (my.sprite.player.running > 1 && my.sprite.player.air == enumList.GROUNDED && !my.sprite.player.body.blocked.left && !my.sprite.player.body.blocked.right) {
+        if (my.sprite.player.moving && my.sprite.player.air == enumList.GROUNDED && Math.abs(my.sprite.player.body.velocity.x) > 700 /*&& !my.sprite.player.body.blocked.left && !my.sprite.player.body.blocked.right*/) {
             //run particle
-            this.add.particles(my.sprite.player.x - my.sprite.player.facing*20, my.sprite.player.y+my.sprite.player.displayHeight/1.9, 'particle', { 
+            
+            this.add.particles(my.sprite.player.x, my.sprite.player.y+my.sprite.player.displayHeight/1.9, 'particle', { 
                 active: true,
                 speedX: 100,
-                speedY: -20,
-                lifespan: (Math.abs(my.sprite.player.body.velocity.x)-100)/5,
+                speedY: -40,
+                lifespan: (Math.abs(my.sprite.player.body.velocity.x)-500)/5,
                 quantity: 2,
                 rotate: { min: 160, max: 200 },
                 
@@ -335,7 +351,7 @@ class Platformer extends Phaser.Scene {
                 alpha: { start: .4, end: 0 },
                 emitting: true,
                 emitZone: { type: 'edge', source: my.sprite.player, quantity:2 },
-                duration: 10,
+                duration: 10
                 //speedX: 100
             });
         }
