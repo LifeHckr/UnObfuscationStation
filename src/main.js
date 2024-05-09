@@ -22,6 +22,7 @@ let config = {
     //fps: { forceSetTimeOut: true, target: 60 },
     physics: {
         default: 'arcade',
+        type: Phaser.WEBGL,
         arcade: {
             debug: true,
             fps: 30,
@@ -42,8 +43,8 @@ var cursors;
 const SCALE = 2.0;
 var my = {sprite: {}, text: {}};
 const enumList = {
-    RIGHT: 0,
-    LEFT: 1,
+    RIGHT: 1,
+    LEFT: -1,
     JUMPING: 2,
     GROUNDED: 3,
     INAIR: 4,

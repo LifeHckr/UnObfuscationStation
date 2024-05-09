@@ -7,7 +7,7 @@ class Platformer extends Phaser.Scene {
         // variables and settings
         this.ACCELERATION = 80;
         this.RUNMULTI = 3;
-        this.RUNTHRESHOLD = 400;
+        this.RUNTHRESHOLD = 500;
         this.STARTVELOCITY = 300;
         this.MAXVELOCITYX = 1000;
         this.MAXVELOCITYY = 1500;
@@ -23,6 +23,8 @@ class Platformer extends Phaser.Scene {
 
     preload() {
         this.load.scenePlugin('AnimatedTiles', './lib/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');
+
+        
     }
 
     create() {
@@ -49,7 +51,13 @@ class Platformer extends Phaser.Scene {
         my.sprite.player.setCollideWorldBounds(true);
         this.physics.world.setBounds(0, -200, this.worldBoundsX, this.worldBoundsY, 64, true, true, false, true);
         // Enable collision handling
-        this.physics.add.collider(my.sprite.player, this.groundLayer);
+        /*my.groundCollider = this.physics.add.collider(my.sprite.player, this.groundLayer, null, 
+            function (player, layer) {
+                return my.sprite.player.body.velocity.y > 0; 
+            }
+        );*/
+        my.groundCollider = this.physics.add.collider(my.sprite.player, this.groundLayer);
+
         my.sprite.player.body.setMaxVelocity(this.MAXVELOCITYX, this.MAXVELOCITYY);
 
         my.sprite.player.moving = false;
@@ -67,6 +75,7 @@ class Platformer extends Phaser.Scene {
         my.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         // debug key listener (assigned to D key)
         this.input.keyboard.on('keydown-X', () => {
+            
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
             this.physics.world.debugGraphic.clear()
         }, this);
@@ -86,6 +95,12 @@ class Platformer extends Phaser.Scene {
         my.camera.setBounds(0, -200, this.worldBoundsX, this.worldBoundsY);
 //-----------------------------------------
 
+//Tweens
+    
+//---------------------------------------------
+//Particles?------------------------------------
+        
+//-----------------------------------------------
     }
 
     update() {
@@ -95,6 +110,7 @@ class Platformer extends Phaser.Scene {
 
         } else if ((cursors.left.isDown || my.keyA.isDown) == (cursors.right.isDown || my.keyD.isDown)) {
             if (Math.abs(my.sprite.player.body.velocity.x) < this.RUNTHRESHOLD) {
+                my.sprite.player.anims.play('idle');
                 my.sprite.player.running = 1;
             }
             
@@ -110,7 +126,7 @@ class Platformer extends Phaser.Scene {
                 my.sprite.player.body.setAngularVelocity(0);
             }
             my.sprite.player.body.setAccelerationX(0);
-            my.sprite.player.body.setDragX(this.DRAG * 2);
+            my.sprite.player.body.setDragX(this.DRAG * 1.5);
             //my.sprite.player.anims.play('idle');
             
         } else {
@@ -124,6 +140,7 @@ class Platformer extends Phaser.Scene {
                             callback: ()=>{
                                 my.sprite.player.body.setVelocityX(-1*my.sprite.player.body.velocity.x);
                                 my.sprite.player.animating = false;
+                                my.sprite.player.body.velocity.y += 70;
                             },
                             
                             loop: false
@@ -156,6 +173,7 @@ class Platformer extends Phaser.Scene {
                             callback: ()=>{
                                 my.sprite.player.body.setVelocityX(-1*my.sprite.player.body.velocity.x);
                                 my.sprite.player.animating = false;
+                                my.sprite.player.body.velocity.y += 70;
                                 
                             },
                             
@@ -185,6 +203,7 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.body.setAngularVelocity(my.sprite.player.body.velocity.x);
             if (Math.abs(my.sprite.player.body.velocity.x) > this.RUNTHRESHOLD) {
                 my.sprite.player.running = this.RUNMULTI;
+                my.sprite.player.anims.play('fast');
             }
         }
          
@@ -195,10 +214,15 @@ class Platformer extends Phaser.Scene {
         if (my.sprite.player.animating) {
 
         } else if(!my.sprite.player.body.blocked.down) {
-            my.sprite.player.anims.play('jump');
+            if (my.sprite.player.running > 1) {
+                my.sprite.player.anims.play('fastJump');
+            } else {
+                my.sprite.player.anims.play('jump');
+            }
+            
             if (my.sprite.player.air == enumList.GROUNDED) {
                 my.coyoteTimer = this.time.addEvent({
-                    delay: 85,                // ms
+                    delay: 134,                // ms
                     callback: ()=>{
                         my.sprite.player.air = enumList.NOJUMP
                     },
@@ -211,6 +235,25 @@ class Platformer extends Phaser.Scene {
             
         }
         if(my.sprite.player.body.blocked.down) {
+            if (my.sprite.player.air != enumList.GROUNDED) {
+                
+                this.tweens.add({
+                    onUpdate: function () {my.sprite.player.setBodySize(24 *(2/my.sprite.player.scaleX), 24*(2/my.sprite.player.scaleY))},
+                    targets     : my.sprite.player,
+                    scaleY      : 1.5,
+                    ease        : 'Linear',
+                    duration    : 120,
+                    yoyo: true,
+                    onYoyo: function () {console.log(my.sprite.player.scaleY)},
+                    onComplete: function () {
+                        my.sprite.player.setBodySize(24, 24); 
+                        my.sprite.player.scale = 2;
+                    },
+                });
+
+                
+            }
+            
             my.sprite.player.air = enumList.GROUNDED;
             //my.sprite.player.doubleJump = true;
             
@@ -219,10 +262,43 @@ class Platformer extends Phaser.Scene {
         if((my.sprite.player.air != enumList.NOJUMP /*|| my.sprite.player.doubleJump*/) && (cursors.up.isDown||my.keySpace.isDown)) {
             
             //console.log(my.sprite.player.doubleJump);
-            console.log(my.sprite.player.air == enumList.NOJUMP);
+            //console.log(my.sprite.player.air == enumList.NOJUMP);
             if (my.sprite.player.air == enumList.GROUNDED) {
                 my.sprite.player.air = enumList.INAIR;
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
+                //jump particle
+                this.add.particles(my.sprite.player.x, my.sprite.player.y+my.sprite.player.displayHeight/1.9, 'particle', { 
+                    angle: { min: 0, max: 360 },
+                    radial: true,
+                    delay: 10,
+                    active: true,
+                    speed: 100,
+                    lifespan: 110,
+                    quantity: 7,
+                    scale: { start: 1, end: 0 },
+                    emitting: true,
+                    emitZone: { type: 'random', source: my.sprite.player, quantity:100 },
+                    duration: 40,
+                    //speedX: 100
+                });
+                
+                
+                this.tweens.add({
+                    onUpdate: function () {my.sprite.player.setBodySize(24 *(2/my.sprite.player.scale), 24*(2/my.sprite.player.scale))},
+                    targets     : my.sprite.player,
+                    scale      : 2.5,
+                    ease        : 'Linear',
+                    duration    : 150,
+                    yoyo: true,
+                    
+                    onComplete: function () {
+                        my.sprite.player.setBodySize(24, 24); 
+                        my.sprite.player.scale = 2;
+                    },
+                });
+                
+                
+                
 
                 my.sillyTime = this.time.addEvent({
                     delay: 130,                // ms
@@ -245,6 +321,24 @@ class Platformer extends Phaser.Scene {
         }
         my.sprite.player.body.setAllowGravity(!my.sprite.player.animating);
 
+        if (my.sprite.player.running > 1 && my.sprite.player.air == enumList.GROUNDED && !my.sprite.player.body.blocked.left && !my.sprite.player.body.blocked.right) {
+            //run particle
+            this.add.particles(my.sprite.player.x - my.sprite.player.facing*20, my.sprite.player.y+my.sprite.player.displayHeight/1.9, 'particle', { 
+                active: true,
+                speedX: 100,
+                speedY: -20,
+                lifespan: (Math.abs(my.sprite.player.body.velocity.x)-100)/5,
+                quantity: 2,
+                rotate: { min: 160, max: 200 },
+                
+                scale: { start: .5, end: 2 },
+                alpha: { start: .4, end: 0 },
+                emitting: true,
+                emitZone: { type: 'edge', source: my.sprite.player, quantity:2 },
+                duration: 10,
+                //speedX: 100
+            });
+        }
     }
 //----------------------------------------------------
 }
