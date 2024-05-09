@@ -5,6 +5,7 @@ class Platformer extends Phaser.Scene {
 
     init() {
         // variables and settings
+        this.scene = this;
         this.ACCELERATION = 80;
         this.RUNMULTI = 3;
         this.RUNTHRESHOLD = 500;
@@ -212,12 +213,22 @@ class Platformer extends Phaser.Scene {
                     my.bumpTimed = true;
                     my.bumpTime = this.time.addEvent({
                         delay: 100,                // ms
-                        callback: function () {
+                        args: [this.scene],
+                        callback: function (scene) {
                             if (my.sprite.player.body.blocked.right || my.sprite.player.body.blocked.left) {
                                 my.sprite.player.running = 1;
                                 my.sprite.player.anims.play('idle');
-                                //console.log("test2");
-                            }
+                               // my.sprite.player.animating = true;
+                                //my.sprite.player.body.setAccelerationX(18500 * my.sprite.player.facing);
+                                //my.sprite.player.body.setDragX(2.2*this.DRAG);
+                                /*scene.time.delayedCall(
+                                    10,                // ms
+                                    ()=>{
+                                        my.sprite.player.animating = false;
+                                    });
+                                
+                                //console.log("test2");*/
+                                }
                             my.bumpTimed = false;
                         },
                     });
