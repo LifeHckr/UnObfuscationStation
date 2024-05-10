@@ -253,7 +253,7 @@ this.tweens.add({
                             callback: ()=>{
                                 my.sprite.player.body.setVelocityX(-1*my.sprite.player.body.velocity.x);
                                 my.sprite.player.animating = false;
-                                my.sprite.player.body.velocity.y += 70;
+                                my.sprite.player.body.velocity.y += 69;
                             },
                             
                             loop: false
