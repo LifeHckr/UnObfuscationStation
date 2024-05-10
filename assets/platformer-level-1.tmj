@@ -296,8 +296,8 @@
                  "type":"player",
                  "visible":true,
                  "width":0,
-                 "x":53.8333333333335,
-                 "y":640.666666666667
+                 "x":53.8333,
+                 "y":640.667
                 }, 
                 {
                  "gid":120,
@@ -464,7 +464,7 @@
                  "type":"sign",
                  "visible":true,
                  "width":18,
-                 "x":2602.66666666667,
+                 "x":2602.67,
                  "y":666
                 }, 
                 {
@@ -524,7 +524,7 @@
                  "type":"sign",
                  "visible":true,
                  "width":18,
-                 "x":3160.69696969697,
+                 "x":3160.7,
                  "y":666
                 }, 
                 {
@@ -562,6 +562,42 @@
                  "width":18,
                  "x":0,
                  "y":432
+                }, 
+                {
+                 "gid":146,
+                 "height":18,
+                 "id":45,
+                 "name":"",
+                 "rotation":0,
+                 "type":"enemSpawn",
+                 "visible":true,
+                 "width":18,
+                 "x":-72,
+                 "y":144
+                }, 
+                {
+                 "gid":146,
+                 "height":18,
+                 "id":46,
+                 "name":"",
+                 "rotation":0,
+                 "type":"enemSpawn",
+                 "visible":true,
+                 "width":18,
+                 "x":2988,
+                 "y":666
+                }, 
+                {
+                 "gid":152,
+                 "height":18,
+                 "id":47,
+                 "name":"Theoretically obtainable",
+                 "rotation":0,
+                 "type":"coin",
+                 "visible":true,
+                 "width":18,
+                 "x":3222,
+                 "y":18
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -570,7 +606,7 @@
          "y":0
         }],
  "nextlayerid":12,
- "nextobjectid":45,
+ "nextobjectid":48,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

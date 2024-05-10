@@ -7,6 +7,7 @@ class Platformer extends Phaser.Scene {
         // variables and settings
         this.scene = this;
         this.ACCELERATION = 80;
+        this.FRAMEFUDGE = game.config.physics.arcade.fps / 30;
         this.RUNMULTI = 3;
         this.RUNTHRESHOLD = 500;
         this.STARTVELOCITY = 300;
@@ -16,8 +17,8 @@ class Platformer extends Phaser.Scene {
         this.physics.world.gravity.y = 1900;
         this.JUMP_VELOCITY = -650;
         this.TEMP_JUMPVELOCITY = -1975;
-        this.worldBoundsX = 2 * 18 * (180); //scale = 2, 18 = width of tile, x = num tiles
-        this.worldBoundsY = 2 * 18 * (40);
+        this.worldBoundsX = SCALE * 18 * (180); //scale = 2, 18 = width of tile, x = num tiles
+        this.worldBoundsY = SCALE * 18 * (40);
         my.camera = this.cameras.main;
         
     }
@@ -31,7 +32,7 @@ class Platformer extends Phaser.Scene {
     create() {
 //SPRITES------------------------------------------------------------
         my.sprite.xMark = this.add.sprite(0, 0, "x");
-        my.sprite.xMark.scale =2;
+        my.sprite.xMark.scale = SCALE;
         my.sprite.xMark.visible =false;
         my.sprite.xMark.setDepth(1);
         my.signText = this.add.text(30, 58, 'Placeholder', { font: '40px Roboto', fill: '0xFFFFFFF' });
@@ -39,11 +40,11 @@ class Platformer extends Phaser.Scene {
         my.signText.x = 600;
         my.signText.setScrollFactor(0);
         my.signText.visible = false;
-        my.signText.setDepth(2);
+        my.signText.setDepth(5);
 
         my.sprite.signBoard = this.add.sprite(600, 50, "sign");
         my.sprite.signBoard.angle = 180;
-        my.sprite.signBoard.setDepth(1);
+        my.sprite.signBoard.setDepth(4);
         my.sprite.signBoard.setScale(50, 15);
         my.sprite.signBoard.setScrollFactor(0);
         my.sprite.signBoard.visible = false;
@@ -54,26 +55,26 @@ class Platformer extends Phaser.Scene {
         this.tileset = this.map.addTilesetImage("kenny_tilemap_packed", "tilemap_tiles");
         //groundLayer
         this.groundLayer = this.map.createLayer("Ground-n-Platforms", this.tileset, 0, 0);
-        this.groundLayer.setScale(2.0);
+        this.groundLayer.setScale(SCALE);
         //topLayer
         this.topLayer = this.map.createLayer("Above-Ground", this.tileset, 0, 0);
-        this.topLayer.setScale(2.0);
+        this.topLayer.setScale(SCALE);
         this.topLayer.setAlpha(.8).setDepth(1);
         this.animatedTiles.init(this.map);
         //bottomLayer
         this.botLayer = this.map.createLayer("Below-Ground", this.tileset, 0, 0);
-        this.botLayer.setScale(2.0);
+        this.botLayer.setScale(SCALE);
         this.botLayer.setDepth(-1);
         //collision layer
         this.colLayer = this.map.createLayer("Collision-Layer", this.tileset, 0, 0);
-        this.colLayer.setScale(2.0);
+        this.colLayer.setScale(SCALE);
         this.colLayer.setAlpha(0);
         this.colLayer.setCollisionByProperty({
             collides: true
         });
         //Uh oh
         this.oneWLayer = this.map.createLayer("One-Layer", this.tileset, 0, 0);
-        this.oneWLayer.setScale(2.0);
+        this.oneWLayer.setScale(SCALE);
         this.oneWLayer.setAlpha(0);
         this.oneWLayer.setCollisionByProperty({
             oneWay: true
@@ -85,9 +86,9 @@ class Platformer extends Phaser.Scene {
             key: "coin"
         });
         my.coins.map((coin) => {
-            coin.scale = 2;
-            coin.x *= 2;
-            coin.y *= 2;
+            coin.scale = SCALE;
+            coin.x *= SCALE;
+            coin.y *= SCALE;
             this.physics.world.enable(coin, Phaser.Physics.Arcade.STATIC_BODY);
             coin.play('coinTurn');
         });
@@ -99,9 +100,9 @@ class Platformer extends Phaser.Scene {
             key: "sign"
         });
         my.signs.map((sign) => {
-            sign.scale = 2;
-            sign.x *= 2;
-            sign.y *= 2;
+            sign.scale = SCALE;
+            sign.x *= SCALE;
+            sign.y *= SCALE;
             this.physics.world.enable(sign, Phaser.Physics.Arcade.STATIC_BODY);
         });
         my.signGroup = this.add.group(my.signs);
@@ -112,9 +113,9 @@ class Platformer extends Phaser.Scene {
             key: "coin"
         });
         my.playerSpawn.map((spawn) => {
-            spawn.scale = 2;
-            spawn.x *= 2;
-            spawn.y *= 2;
+            spawn.scale = SCALE;
+            spawn.x *= SCALE;
+            spawn.y *= SCALE;
             spawn.visible = false;
 
         });
@@ -136,7 +137,8 @@ class Platformer extends Phaser.Scene {
         my.mapCollider = this.physics.add.collider(my.sprite.player, this.colLayer);
         my.extraCollider = this.physics.add.collider(my.sprite.player, this.oneWLayer, null, function (obj1, obj2) {
             //console.log(obj2);
-            return(obj1.y <= (obj2.y*18*2));
+            let check = (obj1.y + obj1.displayHeight/2) <= (obj2.y*18*SCALE + 5);
+            return(check);
         });
         //my.coinCollider = this.physics.add.collider(my.coinGroup, this.groundLayer);
         this.physics.add.overlap(my.sprite.player, my.coinGroup, (obj1, obj2) => {
@@ -192,7 +194,7 @@ class Platformer extends Phaser.Scene {
 //--------------------------------------
 
 //Camera------------------------------------
-        my.camera.startFollow(my.sprite.player);
+        my.camera.startFollow(my.sprite.player, false, .1, .1);
         my.camera.width = 1200;
         my.camera.height = 700;
         //doesnt work this.displayHeight = my.camera.height;
@@ -227,12 +229,12 @@ this.tweens.add({
                 my.sprite.player.running = 1;
             }
             
-            if (Math.abs(my.sprite.player.body.deltaAbsX() < 20 && my.sprite.player.air == enumList.GROUNDED) ) {
+            if (Math.abs(my.sprite.player.body.deltaAbsX() < (20/this.FRAMEFUDGE) && my.sprite.player.air == enumList.GROUNDED) ) {
                 my.sprite.player.body.setDragX(2.2*this.DRAG);
                 my.sprite.player.moving = false;
                 //my.sprite.player.running = 1;
                 my.sprite.player.body.setAngularVelocity(0);
-            } else if (Math.abs(my.sprite.player.body.deltaAbsX() < 10 && my.sprite.player.air != enumList.GROUNDED)) {
+            } else if (Math.abs(my.sprite.player.body.deltaAbsX() < (10/this.FRAMEFUDGE) && my.sprite.player.air != enumList.GROUNDED)) {
                 my.sprite.player.body.setDragX(this.DRAG);
                 my.sprite.player.moving = false;
                 //my.sprite.player.running = 1;
@@ -378,7 +380,7 @@ this.tweens.add({
                 
                 //Fall Tween
                 this.tweens.add({
-                    onUpdate: function () {my.sprite.player.setBodySize(24 *(2/my.sprite.player.scaleX), 24*(2/my.sprite.player.scaleY))},
+                    onUpdate: function () {my.sprite.player.setBodySize(24 *(SCALE/my.sprite.player.scaleX), 24*(SCALE/my.sprite.player.scaleY))},
                     targets     : my.sprite.player,
                     scaleY      : 1.3,
                     ease        : 'Quart.Out',
@@ -387,7 +389,7 @@ this.tweens.add({
                     onYoyo: function () {true},
                     onComplete: function () {
                         my.sprite.player.setBodySize(24, 24); 
-                        my.sprite.player.scale = 2;
+                        my.sprite.player.scale = SCALE;
                     },
                 });
 
@@ -424,7 +426,7 @@ this.tweens.add({
                 
                 //Jump Tween
                 this.tweens.add({
-                    onUpdate: function () {my.sprite.player.setBodySize(24 *(2/my.sprite.player.scale), 24*(2/my.sprite.player.scale))},
+                    onUpdate: function () {my.sprite.player.setBodySize(24 *(SCALE/my.sprite.player.scale), 24*(SCALE/my.sprite.player.scale))},
                     targets     : my.sprite.player,
                     scale      : 3,
                     ease        : 'Bounce.In',
@@ -433,7 +435,7 @@ this.tweens.add({
                     
                     onComplete: function () {
                         my.sprite.player.setBodySize(24, 24); 
-                        my.sprite.player.scale = 2;
+                        my.sprite.player.scale = SCALE;
                     },
                 });
                 

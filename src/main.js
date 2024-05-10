@@ -22,10 +22,10 @@ let config = {
     //fps: { forceSetTimeOut: true, target: 60 },
     physics: {
         default: 'arcade',
-        type: Phaser.WEBGL,
+        //type: Phaser.WEBGL,
         arcade: {
             //debug: true,
-            fps: 30,
+            fps: 60,
             fixedstep: true,
             tileBias: 64,
             gravity: {
