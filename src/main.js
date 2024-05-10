@@ -24,7 +24,7 @@ let config = {
         default: 'arcade',
         type: Phaser.WEBGL,
         arcade: {
-            debug: true,
+            //debug: true,
             fps: 30,
             fixedstep: true,
             tileBias: 64,

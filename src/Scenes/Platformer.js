@@ -173,8 +173,8 @@ class Platformer extends Phaser.Scene {
         // debug key listener (assigned to D key)
         this.input.keyboard.on('keydown-G', () => {
             my.sprite.player.setDepth(0);
-            this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
-            this.physics.world.debugGraphic.clear()
+            //this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
+            //this.physics.world.debugGraphic.clear()
         }, this);
 
         this.input.keyboard.on('keydown-L', () => {
