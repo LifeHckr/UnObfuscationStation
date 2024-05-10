@@ -14,10 +14,10 @@ class Platformer extends Phaser.Scene {
         this.MAXVELOCITYY = 1000;
         this.DRAG = 1500;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1900;
-        this.JUMP_VELOCITY = -675;
-        this.TEMP_JUMPVELOCITY = -1965;
-        this.worldBoundsX = 2 * 18 * (90); //scale = 2, 18 = width of tile, x = num tiles
-        this.worldBoundsY = 2 * 18 * (25) + 200;
+        this.JUMP_VELOCITY = -650;
+        this.TEMP_JUMPVELOCITY = -1975;
+        this.worldBoundsX = 2 * 18 * (180); //scale = 2, 18 = width of tile, x = num tiles
+        this.worldBoundsY = 2 * 18 * (40);
         my.camera = this.cameras.main;
         
     }
@@ -29,36 +29,130 @@ class Platformer extends Phaser.Scene {
     }
 
     create() {
+//SPRITES------------------------------------------------------------
+        my.sprite.xMark = this.add.sprite(0, 0, "x");
+        my.sprite.xMark.scale =2;
+        my.sprite.xMark.visible =false;
+        my.sprite.xMark.setDepth(1);
+        my.signText = this.add.text(30, 58, 'Placeholder', { font: '40px Roboto', fill: '0xFFFFFFF' });
+        my.signText.setOrigin(.5);
+        my.signText.x = 600;
+        my.signText.setScrollFactor(0);
+        my.signText.visible = false;
+        my.signText.setDepth(2);
+
+        my.sprite.signBoard = this.add.sprite(600, 50, "sign");
+        my.sprite.signBoard.angle = 180;
+        my.sprite.signBoard.setDepth(1);
+        my.sprite.signBoard.setScale(50, 15);
+        my.sprite.signBoard.setScrollFactor(0);
+        my.sprite.signBoard.visible = false;
+
+//----------------------------------------------------------------
 //TILEMAP--------------------------------------------------------------
         this.map = this.add.tilemap("platformer-level-1", 18, 18, 45, 25);
         this.tileset = this.map.addTilesetImage("kenny_tilemap_packed", "tilemap_tiles");
         //groundLayer
         this.groundLayer = this.map.createLayer("Ground-n-Platforms", this.tileset, 0, 0);
         this.groundLayer.setScale(2.0);
-        this.groundLayer.setCollisionByProperty({
-            collides: true
-        });
         //topLayer
         this.topLayer = this.map.createLayer("Above-Ground", this.tileset, 0, 0);
         this.topLayer.setScale(2.0);
         this.topLayer.setAlpha(.8).setDepth(1);
         this.animatedTiles.init(this.map);
-
+        //bottomLayer
+        this.botLayer = this.map.createLayer("Below-Ground", this.tileset, 0, 0);
+        this.botLayer.setScale(2.0);
+        this.botLayer.setDepth(-1);
+        //collision layer
+        this.colLayer = this.map.createLayer("Collision-Layer", this.tileset, 0, 0);
+        this.colLayer.setScale(2.0);
+        this.colLayer.setAlpha(0);
+        this.colLayer.setCollisionByProperty({
+            collides: true
+        });
+        //Uh oh
+        this.oneWLayer = this.map.createLayer("One-Layer", this.tileset, 0, 0);
+        this.oneWLayer.setScale(2.0);
+        this.oneWLayer.setAlpha(0);
+        this.oneWLayer.setCollisionByProperty({
+            oneWay: true
+        });
         //Collection ???
+        //COINS
+        my.coins = this.map.createFromObjects("Objects", {
+            type: "coin",
+            key: "coin"
+        });
+        my.coins.map((coin) => {
+            coin.scale = 2;
+            coin.x *= 2;
+            coin.y *= 2;
+            this.physics.world.enable(coin, Phaser.Physics.Arcade.STATIC_BODY);
+            coin.play('coinTurn');
+        });
+        my.coinGroup = this.add.group(my.coins);
+
+        //SIGNS
+        my.signs = this.map.createFromObjects("Objects", {
+            type: "sign",
+            key: "sign"
+        });
+        my.signs.map((sign) => {
+            sign.scale = 2;
+            sign.x *= 2;
+            sign.y *= 2;
+            this.physics.world.enable(sign, Phaser.Physics.Arcade.STATIC_BODY);
+        });
+        my.signGroup = this.add.group(my.signs);
+
+        //Player Spawn
+        my.playerSpawn = this.map.createFromObjects("Objects", {
+            type: "player",
+            key: "coin"
+        });
+        my.playerSpawn.map((spawn) => {
+            spawn.scale = 2;
+            spawn.x *= 2;
+            spawn.y *= 2;
+            spawn.visible = false;
+
+        });
+        
+
+
 //-----------------------------------------------------------------------------
 
 // Player---------------------------------
-        my.sprite.player = this.physics.add.sprite(game.config.width/4, game.config.height/3, "platformer_characters", "tile_0000.png").setScale(SCALE);
+        my.sprite.player = this.physics.add.sprite(my.playerSpawn[0].x, my.playerSpawn[0].y, "platformer_characters", "tile_0000.png").setScale(SCALE);
         my.sprite.player.setCollideWorldBounds(true);
-        this.physics.world.setBounds(0, -200, this.worldBoundsX, this.worldBoundsY, 64, true, true, false, true);
+        this.physics.world.setBounds(0, 0, this.worldBoundsX, this.worldBoundsY, 64, true, true, false, true);
         // Enable collision handling
         /*my.groundCollider = this.physics.add.collider(my.sprite.player, this.groundLayer, null, 
             function (player, layer) {
                 return my.sprite.player.body.velocity.y > 0; 
             }
         );*/
-        my.groundCollider = this.physics.add.collider(my.sprite.player, this.groundLayer);
-
+        my.mapCollider = this.physics.add.collider(my.sprite.player, this.colLayer);
+        my.extraCollider = this.physics.add.collider(my.sprite.player, this.oneWLayer, null, function (obj1, obj2) {
+            //console.log(obj2);
+            return(obj1.y <= (obj2.y*18*2));
+        });
+        //my.coinCollider = this.physics.add.collider(my.coinGroup, this.groundLayer);
+        this.physics.add.overlap(my.sprite.player, my.coinGroup, (obj1, obj2) => {
+            obj2.destroy();
+        });
+        this.physics.add.overlap(my.sprite.player, my.signGroup, (obj1, obj2) => {
+            //console.log("jhcv");
+            my.sprite.player.signTouch = obj2;
+            if (my.signTouchTimer == undefined) {
+                my.signTouchTimer = this.time.addEvent({
+                    delay: 100
+                });
+            } else {
+                my.signTouchTimer.reset({delay: 100});
+            }
+        });
         my.sprite.player.body.setMaxVelocity(this.MAXVELOCITYX, this.MAXVELOCITYY);
 
         my.sprite.player.moving = false;
@@ -66,6 +160,7 @@ class Platformer extends Phaser.Scene {
         my.sprite.player.facing = enumList.RIGHT;
         my.sprite.player.air = enumList.GROUNDED;
         my.sprite.player.animating = false;
+        my.sprite.player.signTouch = false;
         my.bumpTimed = false;
         //my.sprite.player.doubleJump = true;
 //-----------------------------------------------
@@ -76,14 +171,23 @@ class Platformer extends Phaser.Scene {
         my.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         my.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         // debug key listener (assigned to D key)
-        this.input.keyboard.on('keydown-X', () => {
-            
+        this.input.keyboard.on('keydown-G', () => {
+            my.sprite.player.setDepth(0);
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
             this.physics.world.debugGraphic.clear()
         }, this);
 
         this.input.keyboard.on('keydown-L', () => {
             console.log(my.sprite.player.body.velocity);
+        }, this);
+
+        this.input.keyboard.on('keydown-X', () => {
+            if (my.signTouchTimer != undefined && my.signTouchTimer.getRemaining() != 0) {
+                console.log(my.sprite.player.signTouch.name);
+            }
+            my.signText.text = my.sprite.player.signTouch.name;
+            my.signText.visible = !my.signText.visible;
+            my.sprite.signBoard.visible = !my.sprite.signBoard.visible;
         }, this);
 //--------------------------------------
 
@@ -94,11 +198,18 @@ class Platformer extends Phaser.Scene {
         //doesnt work this.displayHeight = my.camera.height;
         //this.displayWidth = my.camera.Width;
         my.camera.setViewport(0, 0, 1200, 700);
-        my.camera.setBounds(0, -200, this.worldBoundsX, this.worldBoundsY);
+        my.camera.setBounds(0, 0, this.worldBoundsX, this.worldBoundsY);
 //-----------------------------------------
 
 //Tweens
-    
+this.tweens.add({
+    targets     : my.sprite.xMark,
+    scale     : 1.5,
+    ease        : 'Linear',
+    duration    : 600,
+    yoyo: true,
+    repeat: -1
+});
 //---------------------------------------------
 //Particles?------------------------------------
         
@@ -273,7 +384,7 @@ class Platformer extends Phaser.Scene {
                     ease        : 'Quart.Out',
                     duration    : 100,
                     yoyo: true,
-                    onYoyo: function () {console.log(my.sprite.player.scaleY)},
+                    onYoyo: function () {true},
                     onComplete: function () {
                         my.sprite.player.setBodySize(24, 24); 
                         my.sprite.player.scale = 2;
@@ -366,6 +477,31 @@ class Platformer extends Phaser.Scene {
                 //speedX: 100
             });
         }
-    }
 //----------------------------------------------------
+//!!!!!!!!!!!!!!!!!!!!!!------------------------
+        
+        if (my.signTouchTimer != undefined && my.signTouchTimer.getRemaining() != 0) {
+            my.sprite.xMark.x = my.sprite.player.signTouch.x;
+            my.sprite.xMark.y = my.sprite.player.signTouch.y - 50;
+            my.sprite.xMark.visible = true;
+            my.sprite.xMark.alpha = 1;
+            
+            
+            //my.sprite.player.signTouch = false;
+        } else {
+            
+            this.tweens.add({
+                targets     : my.sprite.xMark,
+                alpha      : 0,
+                ease        : 'Linear',
+                duration    : 180
+            });
+            my.signText.visible = false;
+            my.sprite.signBoard.visible = false;
+        }
+        
+        
+        
+//------------------------------------------------------
+    }
 }

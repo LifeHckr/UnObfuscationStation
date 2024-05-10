@@ -11,7 +11,11 @@ class Load extends Phaser.Scene {
 
         // Load tilemap information
         this.load.image("tilemap_tiles", "tilemap_packed.png");        
-        this.load.image("particle", "tile_0154.png");                  
+        this.load.image("particle", "tile_0154.png");
+        this.load.image("coin", "tile_0152.png"); 
+        this.load.image("coin2", "tile_0151.png");
+        this.load.image("sign", "sign.png");   
+        this.load.image("x", "x.png");                  
         // Packed tilemap
         this.load.tilemapTiledJSON("platformer-level-1", "platformer-level-1.tmj");   // Tilemap in JSON
     }
@@ -62,6 +66,17 @@ class Load extends Phaser.Scene {
                 { frame: "tile_0007.png" }
             ],
             repeat: -1
+        });
+
+        this.anims.create({
+            key: 'coinTurn',
+            frames: [
+                { key: 'coin', frame: null },
+                { key: 'coin2', frame: null }
+
+            ],
+            repeat: -1,
+            frameRate: 4
         });
 
 

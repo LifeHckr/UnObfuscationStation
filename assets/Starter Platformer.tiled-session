@@ -35,7 +35,7 @@
         "platformer-level-1.tmx"
     ],
     "project": "Starter Platformer.tiled-project",
-    "property.type": "int",
+    "property.type": "bool",
     "recentFiles": [
         "platformer-level-1.tmx"
     ],
