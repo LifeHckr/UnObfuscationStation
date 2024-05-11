@@ -9,14 +9,14 @@
     ],
     "fileStates": {
         "": {
-            "scaleInEditor": 3
+            "scaleInEditor": 4
         },
         "platformer-level-1.tmx": {
             "scale": 8,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 3172.3125,
-                "y": 38.6875
+                "x": 3263.1875,
+                "y": 46.3125
             }
         },
         "platformer-level-1.tmx#kenny_tilemap_packed": {

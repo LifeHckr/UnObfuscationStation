@@ -89,7 +89,7 @@ class Load extends Phaser.Scene {
             ],
             yoyo: true,
             repeat: -1,
-            frameRate: 4
+            frameRate: 6
         });
 
 

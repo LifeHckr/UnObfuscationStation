@@ -1,3 +1,4 @@
+//An ode to a real one:
 // Jim Whitehead
 // Created: 4/14/2024
 // Phaser: 3.70.0
@@ -11,6 +12,16 @@
 
 // debug with extreme prejudice
 "use strict"
+
+/*
+TODO:
+Custom Font
+Add more plants to the overworld
+Add a stretch of flat land to teach player to run
+Timer/score/end level/game over
+Sound
+Camera offset
+*/
 
 // game config
 let config = {

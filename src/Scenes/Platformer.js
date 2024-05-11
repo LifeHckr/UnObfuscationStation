@@ -38,17 +38,17 @@ class Platformer extends Phaser.Scene {
         my.sprite.xMark.visible =false;
         my.sprite.xMark.setDepth(1);
     //SignText
-        my.signText = this.add.text(30, 58, 'Placeholder', { font: '40px Roboto', fill: '0xFFFFFFF' });
+        my.signText = this.add.text(30, 110, 'Placeholder', { font: '35px Roboto', fill: '0xFFFFFFF' });
         my.signText.setOrigin(.5);
         my.signText.x = 600;
         my.signText.setScrollFactor(0);
         my.signText.visible = false;
         my.signText.setDepth(5);
     //HintText
-        my.sprite.hintText = this.add.text(0, 0, 'A and D to move', { font: '40px Roboto', fill: '#FFFFFFF' }).setOrigin(.5).setPosition(game.config.width/2, game.config.height - 60).setDepth(1).setAngle(-20);
+        my.sprite.hintText = this.add.text(0, 0, 'A and D to move', { font: '32px Roboto', fill: '#FFFFFFF' }).setOrigin(.5).setPosition(game.config.width/2, game.config.height - 120).setDepth(1).setAngle(-20);
         my.sprite.hintText.setScrollFactor(0);
     //signBoard       
-        my.sprite.signBoard = this.add.sprite(600, 50, "sign");
+        my.sprite.signBoard = this.add.sprite(600, 110, "sign");
         my.sprite.signBoard.angle = 180;
         my.sprite.signBoard.setDepth(4);
         my.sprite.signBoard.setScale(50, 15);
@@ -268,7 +268,7 @@ class Platformer extends Phaser.Scene {
         //this.displayWidth = my.camera.Width;
         my.camera.setViewport(0, 0, game.config.width, game.config.height);
         my.camera.setBounds(0, 0, this.worldBoundsX, this.worldBoundsY);
-        my.camera.setZoom(game.config.width/1200, game.config.height/700);
+        my.camera.setZoom(game.config.width/1200 * 1.20, game.config.height/700 * 1.20);
 //-----------------------------------------
 
 //Tweens---------------------------------
@@ -316,7 +316,7 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.body.setAccelerationX(0);
             my.sprite.player.body.setDragX(this.DRAG*1.5);
             if (my.sprite.player.air != enumList.GROUNDED) {
-                my.sprite.player.body.setDragX(this.DRAG);
+                my.sprite.player.body.setDragX(this.DRAG * 1.25);
             }
             if (my.sprite.player.body.deltaAbsX() < (20/this.FRAMEFUDGE) && my.sprite.player.air == enumList.GROUNDED) {
                 my.sprite.player.moving = false;
@@ -335,7 +335,7 @@ class Platformer extends Phaser.Scene {
                         this.time.addEvent({
                             delay: 100,                // ms
                             callback: ()=>{
-                                my.sprite.player.body.setVelocityX(-1*my.sprite.player.body.velocity.x);
+                                my.sprite.player.body.setVelocityX(-.95*my.sprite.player.body.velocity.x);
                                 my.sprite.player.animating = false;
                                 my.sprite.player.body.velocity.y += 69;
                             },
@@ -367,7 +367,7 @@ class Platformer extends Phaser.Scene {
                         this.time.addEvent({
                             delay: 100,                // ms
                             callback: ()=>{
-                                my.sprite.player.body.setVelocityX(-1*my.sprite.player.body.velocity.x);
+                                my.sprite.player.body.setVelocityX(-.95*my.sprite.player.body.velocity.x);
                                 my.sprite.player.animating = false;
                                 my.sprite.player.body.velocity.y += 70;
                                 
