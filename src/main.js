@@ -34,8 +34,8 @@ let config = {
             }
         }
     },
-    width: 1200,
-    height: 700,
+    width:  1200,//window.innerWidth * window.devicePixelRatio
+    height: 700,//window.innerHeight * window.devicePixelRatio,
     scene: [Load, Platformer]
 }
 
@@ -50,5 +50,7 @@ const enumList = {
     INAIR: 4,
     NOJUMP: 5
 };
-
+console.log(window.innerHeight);
+console.log(window.innerWidth);
+console.log(window.devicePixelRatio);
 const game = new Phaser.Game(config);

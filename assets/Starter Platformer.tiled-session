@@ -23,10 +23,11 @@
             "scaleInDock": 3
         },
         "platformer-level-1.tmx#tilemap-backgrounds_packed": {
-            "scaleInDock": 2
+            "scaleInDock": 2,
+            "scaleInEditor": 1
         }
     },
-    "frame.defaultDuration": 290,
+    "frame.defaultDuration": 400,
     "last.exportedFilePath": "C:/Users/Jarod/Documents/CMPM120/UnObfuscationStation/assets",
     "last.imagePath": "C:/Users/Jarod/Documents/CMPM120/UnObfuscationStation/assets",
     "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",

@@ -61,10 +61,6 @@ class Platformer extends Phaser.Scene {
         this.topLayer.setScale(SCALE);
         this.topLayer.setAlpha(.8).setDepth(1);
         this.animatedTiles.init(this.map);
-        //bottomLayer
-        this.botLayer = this.map.createLayer("Below-Ground", this.tileset, 0, 0);
-        this.botLayer.setScale(SCALE);
-        this.botLayer.setDepth(-1);
         //collision layer
         this.colLayer = this.map.createLayer("Collision-Layer", this.tileset, 0, 0);
         this.colLayer.setScale(SCALE);
@@ -79,6 +75,12 @@ class Platformer extends Phaser.Scene {
         this.oneWLayer.setCollisionByProperty({
             oneWay: true
         });
+        //bottom layer
+        this.tileset = this.map.addTilesetImage("tilemap-backgrounds_packed", "background_tiles");
+        this.botLayer = this.map.createLayer("Below-Ground", this.tileset, 0, 0);
+        this.botLayer.setScale(5);
+        this.botLayer.setDepth(-1);
+        this.botLayer.setScrollFactor(.2);
         //Collection ???
         //COINS
         my.coins = this.map.createFromObjects("Objects", {
@@ -119,6 +121,33 @@ class Platformer extends Phaser.Scene {
             spawn.visible = false;
 
         });
+        //Enemy
+        my.enemygroup = this.add.group({
+            classType: Enemy,
+            maxSize: 100,
+            // activate update calls
+            runChildUpdate: true,
+        });
+        my.enemySpawn = this.map.createFromObjects("Objects", {
+            type: "enemSpawn",
+            key: "platformer_characters",
+            frame: "tile_0024.png",
+        });
+        my.enemySpawn.map((enemy) => {
+            enemy.scale = SCALE;
+            enemy.x *= SCALE;
+            enemy.y *= SCALE;
+            enemy.visible = false;
+
+            let newEnemy = new Enemy(this, enemy.x, enemy.y, "platformer_characters", "tile_0024.png");
+            newEnemy.facing = enumList.LEFT;
+            newEnemy.anims.play("enemyFly");
+            my.enemygroup.add(newEnemy);
+            //enemy.body.setAllowGravity(false);
+        });
+        //this.physics.world.enable(my.enemygroup, Phaser.Physics.Arcade.DYNAMIC_BODY);
+        
+        
         
 
 
@@ -155,6 +184,49 @@ class Platformer extends Phaser.Scene {
                 my.signTouchTimer.reset({delay: 100});
             }
         });
+        this.physics.add.overlap(my.sprite.player, my.enemygroup, (obj1, obj2) => {
+            if (obj1.running > 1) {
+                this.add.particles(obj2.x, obj2.y, 'x', { 
+                    angle: { min: 0, max: 360 },
+                    radial: true,
+                    delay: 10,
+                    active: true,
+                    speed: 100,
+                    lifespan: 300,
+                    quantity: 10,
+                    scale: { start: 2, end: 0 },
+                    emitting: true,
+                    emitZone: { type: 'random', source: my.sprite.player, quantity:10, scale: { start: 2, end: 0 } },
+                    duration: 10
+                    //speedX: 100
+                });
+                obj2.destroy();
+            } else if (!obj1.knockback) {
+                
+                obj1.body.setVelocity(0);
+                obj1.body.setAccelerationX(0);
+                obj1.knockback = true;
+                obj1.running = 1;
+                obj1.setAngularVelocity(0);
+                if (obj1.x > obj2.x) {
+                    obj1.body.setVelocity(900, -500);
+                } if (obj1.x < obj2.x) {
+                    obj1.body.setVelocity(-900, -500);
+                } else {
+                    obj1.body.setVelocity(900, -500);
+                }
+                
+                this.time.delayedCall(
+                    475,                // ms
+                    ()=>{
+                        my.sprite.player.knockback = false;
+                    });
+                
+                
+            }
+
+
+        });
         my.sprite.player.body.setMaxVelocity(this.MAXVELOCITYX, this.MAXVELOCITYY);
 
         my.sprite.player.moving = false;
@@ -163,6 +235,7 @@ class Platformer extends Phaser.Scene {
         my.sprite.player.air = enumList.GROUNDED;
         my.sprite.player.animating = false;
         my.sprite.player.signTouch = false;
+        my.sprite.player.knockback = false;
         my.bumpTimed = false;
         //my.sprite.player.doubleJump = true;
 //-----------------------------------------------
@@ -175,12 +248,13 @@ class Platformer extends Phaser.Scene {
         // debug key listener (assigned to D key)
         this.input.keyboard.on('keydown-G', () => {
             my.sprite.player.setDepth(0);
-            //this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
-            //this.physics.world.debugGraphic.clear()
+            this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
+            this.physics.world.debugGraphic.clear()
         }, this);
 
         this.input.keyboard.on('keydown-L', () => {
             console.log(my.sprite.player.body.velocity);
+            my.sprite.player.y = 0;
         }, this);
 
         this.input.keyboard.on('keydown-X', () => {
@@ -195,12 +269,13 @@ class Platformer extends Phaser.Scene {
 
 //Camera------------------------------------
         my.camera.startFollow(my.sprite.player, false, .1, .1);
-        my.camera.width = 1200;
-        my.camera.height = 700;
+        my.camera.width = game.config.width;
+        my.camera.height = game.config.height;
         //doesnt work this.displayHeight = my.camera.height;
         //this.displayWidth = my.camera.Width;
-        my.camera.setViewport(0, 0, 1200, 700);
+        my.camera.setViewport(0, 0, game.config.width, game.config.height);
         my.camera.setBounds(0, 0, this.worldBoundsX, this.worldBoundsY);
+        my.camera.setZoom(game.config.width/1200, game.config.height/700);
 //-----------------------------------------
 
 //Tweens
@@ -221,7 +296,7 @@ this.tweens.add({
     update() {
 
 //SCHMOOVEMENT
-        if (my.sprite.player.animating) {
+        if (my.sprite.player.animating || my.sprite.player.knockback) {
 
         } else if ((cursors.left.isDown || my.keyA.isDown) == (cursors.right.isDown || my.keyD.isDown)) {
             if (Math.abs(my.sprite.player.body.velocity.x) < this.RUNTHRESHOLD) {
@@ -397,11 +472,14 @@ this.tweens.add({
             }
             
             my.sprite.player.air = enumList.GROUNDED;
+            //my.sprite.player.knockback = false;
             //my.sprite.player.doubleJump = true;
             
         }
 
-        if((my.sprite.player.air != enumList.NOJUMP /*|| my.sprite.player.doubleJump*/) && (cursors.up.isDown||my.keySpace.isDown)) {
+        if (my.sprite.player.knockback) {
+
+        } else if((my.sprite.player.air != enumList.NOJUMP /*|| my.sprite.player.doubleJump*/) && (cursors.up.isDown||my.keySpace.isDown)) {
             
             //console.log(my.sprite.player.doubleJump);
             //console.log(my.sprite.player.air == enumList.NOJUMP);
@@ -415,12 +493,12 @@ this.tweens.add({
                     delay: 10,
                     active: true,
                     speed: 100,
-                    lifespan: 110,
+                    lifespan: 200,
                     quantity: 7,
                     scale: { start: 1, end: 0 },
                     emitting: true,
-                    emitZone: { type: 'random', source: my.sprite.player, quantity:100 },
-                    duration: 40,
+                    emitZone: { type: 'random', source: my.sprite.player, quantity:20 },
+                    duration: 10,
                     //speedX: 100
                 });
                 
@@ -459,10 +537,11 @@ this.tweens.add({
 
         }
         my.sprite.player.body.setAllowGravity(!my.sprite.player.animating);
-
+//----------------------------------------------        
+//Dust Particles---------------------------------
         if (my.sprite.player.moving && my.sprite.player.air == enumList.GROUNDED && Math.abs(my.sprite.player.body.velocity.x) > 700 /*&& !my.sprite.player.body.blocked.left && !my.sprite.player.body.blocked.right*/) {
+
             //run particle
-            
             this.add.particles(my.sprite.player.x, my.sprite.player.y+my.sprite.player.displayHeight/1.9, 'particle', { 
                 active: true,
                 speedX: 100,
@@ -501,8 +580,11 @@ this.tweens.add({
             my.signText.visible = false;
             my.sprite.signBoard.visible = false;
         }
-        
-        
+
+        if (my.sprite.player.knockback && my.sprite.player.body.velocity.y == 0) {
+            my.sprite.player.knockback =  false;
+        }
+
         
 //------------------------------------------------------
     }
