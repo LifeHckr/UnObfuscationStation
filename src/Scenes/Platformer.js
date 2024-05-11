@@ -308,7 +308,12 @@ class Platformer extends Phaser.Scene {
         } else if ((cursors.left.isDown || my.keyA.isDown) == (cursors.right.isDown || my.keyD.isDown)) {
         //If under runthreshold stop running
             if (Math.abs(my.sprite.player.body.velocity.x) < this.RUNTHRESHOLD) {
-                my.sprite.player.anims.play('idle');
+                if (my.sprite.player.air != enumList.GROUNDED) {
+                    my.sprite.player.anims.play('jump');
+                } else {
+                    my.sprite.player.anims.play('idle');
+                }
+                
                 my.sprite.player.running = 1;
             }
             
@@ -374,9 +379,11 @@ class Platformer extends Phaser.Scene {
                             },
                             loop: false
                         });
+
                     } else {
                         my.sprite.player.body.setVelocityX(-.85*my.sprite.player.body.velocity.x);
                     }
+                    
                 }
                 if (!my.sprite.player.moving) {
                     my.sprite.player.body.setVelocityX(this.STARTVELOCITY);
@@ -444,6 +451,11 @@ class Platformer extends Phaser.Scene {
         //Simple case, player is "on ground," set to grounded
         if(my.sprite.player.body.blocked.down) {
         //If player was just in air play fall tween
+            if (my.sprite.player.running > 1) {
+                my.sprite.player.anims.play('fast');
+            } else {
+                my.sprite.player.anims.play('idle');
+            }
             if (my.sprite.player.air != enumList.GROUNDED) {
             //Fall Tween
                 this.tweens.add({
@@ -581,6 +593,23 @@ class Platformer extends Phaser.Scene {
                 },
             });
         }
+    //Camera Offset
+    if (my.sprite.player.running > 1) {
+        this.add.tween({
+            targets: my.camera.followOffset,
+            x: -300 * my.sprite.player.facing * ((Math.abs(my.sprite.player.body.velocity.x) / (this.MAXVELOCITYX + 100))),
+            duration: 400,
+            ease: 'Linear'
+        });
+    } else {
+        this.add.tween({
+            targets: my.camera.followOffset,
+            x: 0,
+            duration: 200,
+            ease: 'LinearOut'
+        });
+    }
+
 //------------------------------------------------------
     }
 }
