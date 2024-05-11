@@ -19,13 +19,13 @@ let config = {
     render: {
         pixelArt: true  // prevent pixel art from getting blurred when scaled
     },
-    //fps: { forceSetTimeOut: true, target: 60 },
+    //fps: { forceSetTimeOut: true, target: 30 },
     physics: {
         default: 'arcade',
         //type: Phaser.WEBGL,
         arcade: {
             //debug: true,
-            fps: 60,
+            fps: 60,//I am officially leaving this at 60
             fixedstep: true,
             tileBias: 64,
             gravity: {
