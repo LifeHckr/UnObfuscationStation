@@ -333,7 +333,7 @@ class Platformer extends Phaser.Scene {
                     if (my.sprite.player.running > 1 && !my.sprite.player.animating) {
                         my.sprite.player.animating = true;
                         this.time.addEvent({
-                            delay: 50,                // ms
+                            delay: 100,                // ms
                             callback: ()=>{
                                 my.sprite.player.body.setVelocityX(-1*my.sprite.player.body.velocity.x);
                                 my.sprite.player.animating = false;
