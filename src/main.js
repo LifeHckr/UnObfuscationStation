@@ -35,7 +35,7 @@ let config = {
         default: 'arcade',
         //type: Phaser.WEBGL,
         arcade: {
-            //debug: true,
+            debug: true,
             fps: 60,//I am officially leaving this at 60
             fixedstep: true,
             tileBias: 64,
@@ -47,7 +47,7 @@ let config = {
     },
     width:  1200,//window.innerWidth * window.devicePixelRatio
     height: 700,//window.innerHeight * window.devicePixelRatio,
-    scene: [Load, Platformer]
+    scene: [Load, Start, Platformer, GameOver]
 }
 
 var cursors;

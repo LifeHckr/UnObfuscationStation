@@ -38,14 +38,14 @@ class Platformer extends Phaser.Scene {
         my.sprite.xMark.visible =false;
         my.sprite.xMark.setDepth(1);
     //SignText
-        my.signText = this.add.text(30, 110, 'Placeholder', { fontFamily: 'font1', fontSize: '32px', fill: '#000000', wordWrap: {width: 600}});
+        my.signText = this.add.text(30, 110, 'Placeholder', { fontFamily: 'font1', fontSize: '32px', fill: '#000000', wordWrap: {width: 600},  stroke: '#FFFFFF', strokeThickness: 10});
         my.signText.setOrigin(.5);
         my.signText.x = 600;
         my.signText.setScrollFactor(0);
         my.signText.visible = false;
         my.signText.setDepth(5);
     //HintText
-        my.sprite.hintText = this.add.text(0, 0, 'A and D to move', { fontFamily: 'font1', fontSize: '40px', fill: '#FFFFFFF' }).setOrigin(.5).setPosition(game.config.width/2, game.config.height - 150).setDepth(1).setAngle(-20);
+        my.sprite.hintText = this.add.text(0, 0, 'A and D to move', { fontFamily: 'font1', fontSize: '42px', fill: '#FFFFFFF',  stroke: '#FFFFFF', strokeThickness: 10}).setOrigin(.5).setPosition(game.config.width/2, game.config.height - 160).setDepth(1).setAngle(-20);
         my.sprite.hintText.setScrollFactor(0);
     //signBoard       
         my.sprite.signBoard = this.add.sprite(600, 110, "sign");
@@ -54,7 +54,19 @@ class Platformer extends Phaser.Scene {
         my.sprite.signBoard.setScale(50, 15);
         my.sprite.signBoard.setScrollFactor(0);
         my.sprite.signBoard.visible = false;
-
+    //Timer Text
+        my.sprite.timerText = this.add.text(0, 0, '999', { fontFamily: 'font1', fontSize: '37px', fill: '#FFFFFFF', stroke: '#FFFFFF', strokeThickness: 10 }).setOrigin(1).setScrollFactor(0).setPosition(game.config.width - 121, 115).setDepth(2);
+        //Timer vars
+        my.timer = 999;
+        my.timerTimer = this.time.addEvent({
+            delay: 1000,  // approx 1 sec
+            callback: () => {
+                my.timer -= 1; 
+            },
+            loop: true,
+            paused: true
+        });
+        
 //----------------------------------------------------------------
 
 //TILEMAP--------------------------------------------------------------
@@ -152,6 +164,21 @@ class Platformer extends Phaser.Scene {
             my.enemygroup.add(newEnemy);
             enemy.destroy();//Refactor possibility
         });
+        //Water
+        my.waterPool = this.map.createFromObjects("Objects", {
+            type: "waterPool",
+            key: ""
+        });
+        my.waterPool.map((water) => {
+            water.scale = SCALE;
+            water.x *= SCALE;
+            water.y *= SCALE;
+            water.displayHeight = 36;
+            water.displayWidth = 180;
+            water.visible = false;
+            this.physics.world.enable(water, Phaser.Physics.Arcade.STATIC_BODY);
+        });
+
     //-----------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------
 
@@ -178,6 +205,13 @@ class Platformer extends Phaser.Scene {
     //coinoverlap
         this.physics.add.overlap(my.sprite.player, my.coinGroup, (obj1, obj2) => {
             obj2.destroy();
+            let tempText = this.add.text(0, 0, 'Coin GET!!!', { fontFamily: 'font1', fontSize: '42px', fill: '#5ad28c',  stroke: '#FFFFFF', strokeThickness: 15}).setOrigin(.5).setPosition(game.config.width/2, game.config.height/2).setDepth(10).setAngle(20).setScrollFactor(0);
+                this.tweens.add({
+                    targets     : tempText,
+                    alpha     : 0,
+                    ease        : 'Cubic.In',
+                    duration    : 2000,
+            });
         });
     //signoverlap
         this.physics.add.overlap(my.sprite.player, my.signGroup, (obj1, obj2) => {
@@ -228,10 +262,26 @@ class Platformer extends Phaser.Scene {
                     475,                // ms
                     ()=>{
                         my.sprite.player.knockback = false;
-                    });
+                });
             }
         });
     //enemyOverlap--------------------------------------------
+    //WaterOverlap
+        this.physics.add.overlap(my.sprite.player, my.waterPool, (obj1, obj2) => {
+            
+            if (my.timerTimer) {
+                let tempText = this.add.text(0, 0, 'YOU WIN!!!', { fontFamily: 'font1', fontSize: '42px', fill: '#5ad28c',  stroke: '#FFFFFF', strokeThickness: 15}).setOrigin(.5).setPosition(game.config.width/2, game.config.height/2).setDepth(10).setAngle(-20).setScrollFactor(0);
+                this.tweens.add({
+                    targets     : tempText,
+                    alpha     : 0,
+                    ease        : 'Cubic.In',
+                    duration    : 2000,
+                });
+                my.timerTimer.destroy();
+                my.timerTimer = false;//:)
+            }
+            
+        });
 //-----------------------------------------------
 
 // Controls
@@ -247,7 +297,7 @@ class Platformer extends Phaser.Scene {
                 this.physics.world.debugGraphic.clear()
             }, this);
             this.input.keyboard.on('keydown-L', () => {
-                console.log(my.sprite.player.body.velocity);
+                my.timer = 0;
                 my.sprite.player.y = 0;
             }, this);
         }
@@ -581,7 +631,10 @@ class Platformer extends Phaser.Scene {
         }
 
     //Remove hint once move
-        if (my.sprite.hintText && my.sprite.player.moving) {
+        if (my.sprite.hintText && (my.sprite.player.moving || (cursors.up.isDown||my.keySpace.isDown))) {
+            if (my.timerTimer.paused == true) {
+                my.timerTimer.paused = false;
+            }
             //my.sprite.hintText
             this.tweens.add({
                 targets     : my.sprite.hintText,
@@ -608,6 +661,20 @@ class Platformer extends Phaser.Scene {
             duration: 200,
             ease: 'LinearOut'
         });
+    }
+    //Timer
+    my.sprite.timerText.text = my.timer;
+    if (my.timer % 100 == 0 && my.timer != 0) {
+        my.sprite.timerText.setStroke('#F00000', 10);
+    } else {
+        my.sprite.timerText.setStroke('#FFFFFF', 10);
+    }
+    if (my.timer == 99) {
+        my.sprite.timerText.setFill("#F00000");
+    }
+    if (my.timer < 0) {
+        game.scene.stop('platformerScene');
+        game.scene.start('GameOver');
     }
 
 //------------------------------------------------------

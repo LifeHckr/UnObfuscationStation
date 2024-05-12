@@ -263,7 +263,6 @@
         {
          "draworder":"topdown",
          "id":8,
-         "locked":true,
          "name":"Objects",
          "objects":[
                 {
@@ -299,7 +298,7 @@
                  "visible":true,
                  "width":18,
                  "x":54,
-                 "y":612
+                 "y":630
                 }, 
                 {
                  "gid":120,
@@ -612,15 +611,26 @@
                  "width":18,
                  "x":1620,
                  "y":234
+                }, 
+                {
+                 "height":18,
+                 "id":50,
+                 "name":"",
+                 "rotation":0,
+                 "type":"waterPool",
+                 "visible":true,
+                 "width":90,
+                 "x":3132,
+                 "y":324
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }],
  "nextlayerid":12,
- "nextobjectid":50,
+ "nextobjectid":51,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
