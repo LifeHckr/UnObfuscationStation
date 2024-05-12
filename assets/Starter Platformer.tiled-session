@@ -13,10 +13,10 @@
         },
         "platformer-level-1.tmx": {
             "scale": 2,
-            "selectedLayer": 5,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 217.25,
-                "y": 554.75
+                "x": 216.75,
+                "y": -21.75
             }
         },
         "platformer-level-1.tmx#kenny_tilemap_packed": {
