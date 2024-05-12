@@ -15,12 +15,12 @@
 
 /*
 TODO:
-Custom Font
-Add more plants to the overworld
-Add a stretch of flat land to teach player to run
+XCustom Font
+XAdd more plants to the overworld
+XAdd a stretch of flat land to teach player to run
 Timer/score/end level/game over
 Sound
-Camera offset
+XCamera offset
 */
 
 // game config

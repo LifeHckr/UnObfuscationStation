@@ -12,15 +12,15 @@
             "scaleInEditor": 4
         },
         "platformer-level-1.tmx": {
-            "scale": 8,
-            "selectedLayer": 5,
+            "scale": 2,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 3263.1875,
-                "y": 46.3125
+                "x": 1329.25,
+                "y": 666.25
             }
         },
         "platformer-level-1.tmx#kenny_tilemap_packed": {
-            "scaleInDock": 3
+            "scaleInDock": 2
         },
         "platformer-level-1.tmx#tilemap-backgrounds_packed": {
             "scaleInDock": 2,

@@ -20,7 +20,7 @@ class Platformer extends Phaser.Scene {
         
         this.physics.world.gravity.y = 1900;
 
-        this.worldBoundsX = SCALE * 18 * (180); //scale = 2, 18 = width of tile, x = num tiles
+        this.worldBoundsX = SCALE * 18 * (215); //scale = 2, 18 = width of tile, x = num tiles
         this.worldBoundsY = SCALE * 18 * (40);
         this.physics.world.setBounds(0, 0, this.worldBoundsX, this.worldBoundsY, 64, true, true, false, true);
         my.camera = this.cameras.main;
@@ -38,14 +38,14 @@ class Platformer extends Phaser.Scene {
         my.sprite.xMark.visible =false;
         my.sprite.xMark.setDepth(1);
     //SignText
-        my.signText = this.add.text(30, 110, 'Placeholder', { font: '35px Roboto', fill: '0xFFFFFFF' });
+        my.signText = this.add.text(30, 110, 'Placeholder', { fontFamily: 'font1', fontSize: '32px', fill: '#000000', wordWrap: {width: 600}});
         my.signText.setOrigin(.5);
         my.signText.x = 600;
         my.signText.setScrollFactor(0);
         my.signText.visible = false;
         my.signText.setDepth(5);
     //HintText
-        my.sprite.hintText = this.add.text(0, 0, 'A and D to move', { font: '32px Roboto', fill: '#FFFFFFF' }).setOrigin(.5).setPosition(game.config.width/2, game.config.height - 120).setDepth(1).setAngle(-20);
+        my.sprite.hintText = this.add.text(0, 0, 'A and D to move', { fontFamily: 'font1', fontSize: '40px', fill: '#FFFFFFF' }).setOrigin(.5).setPosition(game.config.width/2, game.config.height - 150).setDepth(1).setAngle(-20);
         my.sprite.hintText.setScrollFactor(0);
     //signBoard       
         my.sprite.signBoard = this.add.sprite(600, 110, "sign");
@@ -261,7 +261,7 @@ class Platformer extends Phaser.Scene {
 //--------------------------------------
 
 //Camera------------------------------------
-        my.camera.startFollow(my.sprite.player, false, .1, .1);
+        my.camera.startFollow(my.sprite.player, true, .1, .1);
         my.camera.width = game.config.width;
         my.camera.height = game.config.height;
         //doesnt work this.displayHeight = my.camera.height;
