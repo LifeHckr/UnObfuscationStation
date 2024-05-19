@@ -60,19 +60,22 @@ class Start extends Phaser.Scene {
         this.background.tilePositionY -= .5;
         this.background.tilePositionX -= .2;
         if (!this.runOncey) {
-            this.runOnce();
+            //this.runOnce();
             this.runOncey = true;
         }
 
     }
 
     runOnce() {
-        my.sprite.gO = this.add.text(0, 0, "You're an alien.", { fontFamily: 'font1', fontSize: '40px', fill: '#5ad28c', stroke: '#FFFFFF', strokeThickness: 14 }).setOrigin(.5).setPosition(game.config.width/2, 60).setScale(50);
+        my.sprite.gO = this.add.text(0, 0, "You're an alien.", { fontFamily: 'font1', fontSize: '40px', fill: '#5ad28c', stroke: '#FFFFFF', strokeThickness: 14 }).setOrigin(.5).setPosition(game.config.width/2, 60).setScale(50).setVisible(false);
         this.tweens.add({
             targets     : my.sprite.gO,
             scale     : 1,
             ease        : 'Cubic.In',
             duration    : 500,
+            onStart: () => {
+                my.sprite.gO.visible = true;  
+            }
         });
         my.sprite.g1 = this.add.text(0, 0, "You're about to explode.", { fontFamily: 'font1', fontSize: '38px', fill: '#5ad28c', stroke: '#FFFFFF', strokeThickness: 13 }).setOrigin(.5).setPosition(game.config.width/2, 200).setScale(50).setVisible(false);
         this.tweens.add({

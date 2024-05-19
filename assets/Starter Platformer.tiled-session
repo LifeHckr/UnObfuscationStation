@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "platformer-level-1.tmx",
+    "activeFile": "C:/Users/Jarod/Documents/CMPM120/PlatformImprovement/assets/platformer-level-1.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -11,12 +11,23 @@
         "": {
             "scaleInEditor": 4
         },
+        "C:/Users/Jarod/Documents/CMPM120/PlatformImprovement/assets/platformer-level-1.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 508.5,
+                "y": 376.5
+            }
+        },
+        "C:/Users/Jarod/Documents/CMPM120/PlatformImprovement/assets/platformer-level-1.tmx#kenny_tilemap_packed": {
+            "scaleInDock": 3
+        },
         "platformer-level-1.tmx": {
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 216.75,
-                "y": -21.75
+                "x": 1935,
+                "y": 359.75
             }
         },
         "platformer-level-1.tmx#kenny_tilemap_packed": {
@@ -36,12 +47,14 @@
     "map.tileWidth": 18,
     "map.width": 40,
     "openFiles": [
-        "platformer-level-1.tmx"
+        "platformer-level-1.tmx",
+        "C:/Users/Jarod/Documents/CMPM120/PlatformImprovement/assets/platformer-level-1.tmx"
     ],
     "project": "Starter Platformer.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "platformer-level-1.tmx"
+        "platformer-level-1.tmx",
+        "C:/Users/Jarod/Documents/CMPM120/PlatformImprovement/assets/platformer-level-1.tmx"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

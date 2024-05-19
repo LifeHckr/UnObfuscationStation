@@ -18,13 +18,13 @@ class screenLoop extends Phaser.GameObjects.Sprite {
             this.y -= this.speedY;
             this.x -= this.speedX;
             this.angle -= (this.speedX + this.speedY)/2;
-            if (this.y < (0 - this.displayHeight/2) || this.y > (game.config.height + this.displayHeight/2)) {
-                this.y = game.config.height - this.y;
-                //this.speedY *= -1;
+            if (this.y < (0 - this.displayHeight+10/2) || this.y > (game.config.height + (this.displayHeight+10)/2)) {
+                //this.y = game.config.height - this.y;
+                this.speedY *= -1;
             }
-            if (this.x < (0 - this.displayHeight/2) || this.x > (game.config.width + this.displayHeight/2)) {
-                this.x = game.config.width - this.x;
-                //this.speedX *= -1;
+            if (this.x < (0 - this.displayHeight+10/2) || this.x > (game.config.width + this.displayHeight+10/2)) {
+                //this.x = game.config.width - this.x;
+                this.speedX *= -1;
 
             }
         }
