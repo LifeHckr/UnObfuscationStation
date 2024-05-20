@@ -22,6 +22,14 @@ class Load extends Phaser.Scene {
         this.load.image("spackBack", "darkPurple.png");                  
         // Packed tilemap
         this.load.tilemapTiledJSON("platformer-level-1", "platformer-level-1.tmj");   // Tilemap in JSON
+
+        //AUDIO
+        this.load.audio("bwah", "audio/404775__owlstorm__retro-video-game-sfx-bwah.wav");
+        this.load.audio("jingle", "audio/448261__henryrichard__sfx-begin.wav");
+        this.load.audio("music", "audio/335571__magntron__gamemusic.mp3");
+        //this.load.audio("jumpSound", "audio/383240__jofae__bounce.wav");
+        this.load.audio("landSound", "audio/701084__8bitmyketison__multimedia-water-drop-lo-fi.wav");
+
     }
 
     create() {

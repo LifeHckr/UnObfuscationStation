@@ -38,8 +38,8 @@ class Platformer extends Phaser.Scene {
         my.sprite.xMark.visible =false;
         my.sprite.xMark.setDepth(1);
     //SignText
-        my.signText = this.add.text(30, 110, 'Placeholder', { fontFamily: 'font1', fontSize: '32px', fill: '#000000', wordWrap: {width: 600},  stroke: '#FFFFFF', strokeThickness: 10});
-        my.signText.setOrigin(.5);
+        my.signText = this.add.text(30, 70, 'Placeholder', { fontFamily: 'font1', fontSize: '32px', fill: '#000000', wordWrap: {width: 600},  stroke: '#FFFFFF', strokeThickness: 10});
+        my.signText.setOrigin(.5, 0);
         my.signText.x = 600;
         my.signText.setScrollFactor(0);
         my.signText.visible = false;
@@ -205,6 +205,7 @@ class Platformer extends Phaser.Scene {
     //coinoverlap
         this.physics.add.overlap(my.sprite.player, my.coinGroup, (obj1, obj2) => {
             obj2.destroy();
+            this.sound.play("jingle");
             let tempText = this.add.text(0, 0, 'Coin GET!!!', { fontFamily: 'font1', fontSize: '42px', fill: '#5ad28c',  stroke: '#FFFFFF', strokeThickness: 15}).setOrigin(.5).setPosition(game.config.width/2, game.config.height/2).setDepth(10).setAngle(20).setScrollFactor(0);
                 this.tweens.add({
                     targets     : tempText,
@@ -240,6 +241,7 @@ class Platformer extends Phaser.Scene {
                     emitZone: { type: 'random', source: my.sprite.player, quantity:10, scale: { start: 2, end: 0 } },
                     duration: 10
                 });
+                this.sound.play("bwah");
                 obj2.destroy();
             //Dont reknockback, invince frames
             } else if (!obj1.knockback) {
@@ -257,6 +259,8 @@ class Platformer extends Phaser.Scene {
                 //Give player a nudge to slowdown a bit
                 obj1.body.setDragX(this.DRAG);
                 obj1.body.setAccelerationY(10);
+                my.timer -= 3;
+                this.sound.play("bwah", { rate: 1.5, detune: 200});
                 //Either remove knockback after timer or on grounded
                 this.time.delayedCall(
                     475,                // ms
@@ -270,6 +274,7 @@ class Platformer extends Phaser.Scene {
         this.physics.add.overlap(my.sprite.player, my.waterPool, (obj1, obj2) => {
             
             if (my.timerTimer) {
+                this.sound.play("jingle");
                 let tempText = this.add.text(0, 0, 'YOU WIN!!!', { fontFamily: 'font1', fontSize: '42px', fill: '#5ad28c',  stroke: '#FFFFFF', strokeThickness: 15}).setOrigin(.5).setPosition(game.config.width/2, game.config.height/2).setDepth(10).setAngle(-20).setScrollFactor(0);
                 this.tweens.add({
                     targets     : tempText,
@@ -319,6 +324,7 @@ class Platformer extends Phaser.Scene {
         my.camera.setViewport(0, 0, game.config.width, game.config.height);
         my.camera.setBounds(0, 0, this.worldBoundsX, this.worldBoundsY);
         my.camera.setZoom(game.config.width/1200 * 1.20, game.config.height/700 * 1.20);
+        //my.camera.setDeadzone(100, 100);
 //-----------------------------------------
 
 //Tweens---------------------------------
@@ -346,6 +352,18 @@ class Platformer extends Phaser.Scene {
 //Particles?------------------------------------
         
 //-----------------------------------------------
+
+//Start Musics Music Playback
+        this.sound.play("jingle");
+        this.time.delayedCall(
+            734,                // ms
+            ()=>{
+                my.bgm.play({ loop:true, seek: 100, rate: 1});
+            }
+        )
+        my.bgm.rateVar = 1;
+
+//-------------------------------------    
     }
 
     update() {
@@ -489,7 +507,8 @@ class Platformer extends Phaser.Scene {
                     134,                // ms
                     ()=>{
                         my.sprite.player.air = enumList.NOJUMP
-                    });
+                    }
+                );
         //Reset y momentum if in air
             } else if (my.sprite.player.air == enumList.INAIR || my.sprite.player.air == enumList.NOJUMP) {
                 my.sprite.player.body.setAccelerationY(0);
@@ -508,19 +527,38 @@ class Platformer extends Phaser.Scene {
             }
             if (my.sprite.player.air != enumList.GROUNDED) {
             //Fall Tween
-                this.tweens.add({
-                    onUpdate: function () {my.sprite.player.setBodySize(24 *(SCALE/my.sprite.player.scaleX), 24*(SCALE/my.sprite.player.scaleY))},
-                    targets     : my.sprite.player,
-                    scaleY      : 1.3,
-                    ease        : 'Quart.Out',
-                    duration    : 100,
-                    yoyo: true,
-                    onYoyo: function () {true},
-                    onComplete: function () {
-                        my.sprite.player.setBodySize(24, 24); 
-                        my.sprite.player.scale = SCALE;
-                    },
-                }); 
+                if (my.sprite.player.body.deltaAbsY() > 15) {
+                    this.sound.play("landSound", {mute: false, volume: .5, rate: 1.5, detune: -600});
+                    //More squish when landing from a slightly higher height
+                    this.tweens.add({
+                        onUpdate: function () {my.sprite.player.setBodySize(24 *(SCALE/my.sprite.player.scaleX), 24*(SCALE/my.sprite.player.scaleY))},
+                        targets     : my.sprite.player,
+                        scaleY      : 1.3,
+                        ease        : 'Quart.Out',
+                        duration    : 100,
+                        yoyo: true,
+                        onYoyo: function () {true},
+                        onComplete: function () {
+                            my.sprite.player.setBodySize(24, 24); 
+                            my.sprite.player.scale = SCALE;
+                        },
+                    });
+                } else {
+                    this.tweens.add({
+                        onUpdate: function () {my.sprite.player.setBodySize(24 *(SCALE/my.sprite.player.scaleX), 24*(SCALE/my.sprite.player.scaleY))},
+                        targets     : my.sprite.player,
+                        scaleY      : 1.5,
+                        ease        : 'Quart.Out',
+                        duration    : 100,
+                        yoyo: true,
+                        onYoyo: function () {true},
+                        onComplete: function () {
+                            my.sprite.player.setBodySize(24, 24); 
+                            my.sprite.player.scale = SCALE;
+                        },
+                    }); 
+                }
+
             }
             my.sprite.player.air = enumList.GROUNDED;
             //my.sprite.player.knockback = false;
@@ -535,6 +573,7 @@ class Platformer extends Phaser.Scene {
         } else if((my.sprite.player.air != enumList.NOJUMP /*|| my.sprite.player.doubleJump*/) && (cursors.up.isDown||my.keySpace.isDown)) {
             //If player was just grounded, set to in air, set up velocity, and play anims
             if (my.sprite.player.air == enumList.GROUNDED) {
+                this.sound.play("landSound", {mute: false, volume: .5, rate: .5});
                 my.sprite.player.air = enumList.INAIR;
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
 
@@ -666,16 +705,22 @@ class Platformer extends Phaser.Scene {
     my.sprite.timerText.text = my.timer;
     if (my.timer % 100 == 0 && my.timer != 0) {
         my.sprite.timerText.setStroke('#F00000', 10);
+        my.bgm.rate *= 1.01;
+        my.bgm.rateVar = -(Math.ceil(my.timer/100)/20) + 1.5;
     } else {
+        my.bgm.rate = my.bgm.rateVar;
         my.sprite.timerText.setStroke('#FFFFFF', 10);
+        console.log(my.bgm.rate);
     }
-    if (my.timer == 99) {
+    if (my.timer <= 99) {
+        my.bgm.rateVar = 1.5;
         my.sprite.timerText.setFill("#F00000");
     }
     if (my.timer < 0) {
+        my.bgm.stop();
         game.scene.stop('platformerScene');
         game.scene.start('GameOver');
-    }
+    }        
 
 //------------------------------------------------------
     }
