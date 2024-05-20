@@ -344,7 +344,7 @@ class Platformer extends Phaser.Scene {
             targets     : my.sprite.hintText,
             angle      : 20,
             ease        : 'Cubic.In',
-            duration    : 600,
+            duration    : 500,
             repeat: -1,
             yoyo: true
         });
