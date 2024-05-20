@@ -12,11 +12,11 @@
             "scaleInEditor": 4
         },
         "platformer-level-1.tmx": {
-            "scale": 2,
-            "selectedLayer": 2,
+            "scale": 5.5,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 216.75,
-                "y": -21.75
+                "x": 1901.1818181818182,
+                "y": 441.90909090909093
             }
         },
         "platformer-level-1.tmx#kenny_tilemap_packed": {

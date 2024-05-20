@@ -573,7 +573,7 @@ class Platformer extends Phaser.Scene {
         } else if((my.sprite.player.air != enumList.NOJUMP /*|| my.sprite.player.doubleJump*/) && (cursors.up.isDown||my.keySpace.isDown)) {
             //If player was just grounded, set to in air, set up velocity, and play anims
             if (my.sprite.player.air == enumList.GROUNDED) {
-                this.sound.play("landSound", {mute: false, volume: .5, rate: .5});
+                this.sound.play("landSound", {mute: false, volume: .75, rate: .5});
                 my.sprite.player.air = enumList.INAIR;
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
 
